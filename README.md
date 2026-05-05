@@ -3,7 +3,7 @@
 Real-time audio workstation for EQ, DJ FX, visualization, and YouTube playback. It ships as a web app and a Tauri desktop app, with the same audio pipeline on both platforms.
 
 <p align="center">
-  <img src="assets/equalizer-workspace.png" alt="Modern Audio Enhancer equalizer workspace" />
+  <img src="assets/images/equalizer-workspace.png" alt="Modern Audio Enhancer equalizer workspace" />
 </p>
 
 ## Highlights
@@ -17,17 +17,24 @@ Real-time audio workstation for EQ, DJ FX, visualization, and YouTube playback. 
 
 ## Feature Gallery
 
+### Screenshots
+
 | Feature | Preview |
 |---------|---------|
-| Equalizer and visualization workspace | ![Equalizer workspace](assets/equalizer-workspace.png) |
-| Audio enhancer controls | ![Audio enhancer controls](assets/audio-enhancer-controls.png) |
-| Audio enhancer meters | ![Audio enhancer meters](assets/audio-enhancer-meters.png) |
-| Local file workflow | ![Local file workflow](assets/local-file-workflow.png) |
-| Local file workflow demo | ![Local file demo](assets/local-file-workflow.gif) |
-| YouTube search workflow | ![YouTube search workflow](assets/youtube-search-workflow.png) |
-| YouTube workflow demo | ![YouTube demo](assets/youtube-workflow.gif) |
+| Equalizer and visualization workspace | ![Equalizer workspace](assets/images/equalizer-workspace.png) |
+| Audio enhancer controls | ![Audio enhancer controls](assets/images/audio-enhancer-controls.png) |
+| Audio enhancer meters | ![Audio enhancer meters](assets/images/audio-enhancer-meters.png) |
+| Local file workflow | ![Local file workflow](assets/images/local-file-workflow.png) |
+| YouTube search workflow | ![YouTube search workflow](assets/images/youtube-search-workflow.png) |
 
-The GIFs are used in the README because they are lighter to preview on GitHub. The source MP4 recordings are kept in `assets/` for future re-encoding.
+### Demo GIFs
+
+| Demo | Preview |
+|------|---------|
+| Local file workflow demo | ![Local file demo](assets/demos/local-file-workflow.gif) |
+| YouTube workflow demo | ![YouTube demo](assets/demos/youtube-workflow.gif) |
+
+The GIFs are used in the README because they are lighter to preview on GitHub. The source MP4 recordings are kept in `assets/demos/` for future re-encoding.
 
 ## Feature Details
 
@@ -141,7 +148,7 @@ dj-equalizer-modern/
 ├── frontend/         # React + Vite + TypeScript UI
 ├── backend/          # FastAPI backend for web runtime
 ├── frontend/src-tauri/ # Tauri desktop backend
-├── assets/           # Screenshots, GIFs, and source recordings
+├── assets/           # Screenshots in assets/images and demos in assets/demos
 ├── configs/          # Presets and app config
 ├── scripts/          # Cross-platform setup, run, build, clean scripts
 ├── docs/             # English manuals and project notes

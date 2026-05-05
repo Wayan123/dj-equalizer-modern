@@ -13,6 +13,27 @@ const MAX_AUDIO_DOWNLOAD_BYTES: u64 = 100 * 1024 * 1024;
 const YT_DLP_TIMEOUT_SECS: u64 = 30;
 const STREAM_HOST_SUFFIXES: [&str; 3] = ["googlevideo.com", "youtube.com", "youtube-nocookie.com"];
 
+fn content_type_to_extension(content_type: Option<&str>) -> &'static str {
+    let media_type = content_type
+        .and_then(|value| value.split(';').next())
+        .map(|value| value.trim().to_ascii_lowercase());
+
+    match media_type.as_deref() {
+        Some("audio/webm") | Some("video/webm") => "webm",
+        Some("audio/ogg") | Some("application/ogg") => "ogg",
+        Some("audio/flac") => "flac",
+        Some("audio/aac") => "aac",
+        Some("audio/mpeg") => "mp3",
+        Some("audio/wav") | Some("audio/x-wav") => "wav",
+        Some("audio/amr") => "amr",
+        Some("audio/3gpp") => "3gp",
+        Some("audio/x-m4a") | Some("audio/mp4") | Some("video/mp4") => "m4a",
+        Some("video/x-matroska") => "mkv",
+        Some("video/quicktime") => "mov",
+        _ => "mp4",
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExtractResult {
     pub audio_url: String,
@@ -241,6 +262,8 @@ pub async fn download_audio(url: String) -> Result<String, String> {
         return Err(format!("Upstream returned {}", resp.status()));
     }
 
+    validate_stream_url(resp.url().as_str())?;
+
     if let Some(content_length) = resp.content_length() {
         if content_length > MAX_AUDIO_DOWNLOAD_BYTES {
             return Err("Audio stream is too large".into());
@@ -254,10 +277,20 @@ pub async fn download_audio(url: String) -> Result<String, String> {
         .map_err(|e| format!("Temp directory failed: {}", e))?;
 
     // Generate unique filename
-    let filename = format!("audio_{}.mp4", std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_millis());
+    let content_type = resp
+        .headers()
+        .get(reqwest::header::CONTENT_TYPE)
+        .and_then(|value| value.to_str().ok());
+    let extension = content_type_to_extension(content_type);
+
+    let filename = format!(
+        "audio_{}.{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis(),
+        extension
+    );
     let path = tmp_dir.join(&filename);
 
     let mut file = File::create(&path)
@@ -284,4 +317,24 @@ pub async fn download_audio(url: String) -> Result<String, String> {
         .map_err(|e| format!("Write failed: {}", e))?;
 
     Ok(path.to_string_lossy().to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::content_type_to_extension;
+
+    #[test]
+    fn maps_webm_streams_to_webm_extension() {
+        assert_eq!(content_type_to_extension(Some("audio/webm; codecs=opus")), "webm");
+    }
+
+    #[test]
+    fn maps_mp4_audio_streams_to_m4a_extension() {
+        assert_eq!(content_type_to_extension(Some("audio/mp4")), "m4a");
+    }
+
+    #[test]
+    fn falls_back_to_mp4_when_content_type_is_unknown() {
+        assert_eq!(content_type_to_extension(None), "mp4");
+    }
 }

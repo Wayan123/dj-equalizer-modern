@@ -10,6 +10,13 @@ from app.security.rate_limit import limiter
 router = APIRouter()
 
 
+def _normalize_media_type(content_type: str | None, fallback: str = "audio/mpeg") -> str:
+    if not content_type:
+        return fallback
+    media_type = content_type.split(";", 1)[0].strip()
+    return media_type or fallback
+
+
 class YouTubeRequest(BaseModel):
     url: str
 
@@ -45,24 +52,46 @@ async def stream_youtube(request: Request, url: str):
     if not stream_url:
         raise HTTPException(status_code=400, detail="Invalid stream URL")
 
-    async def audio_generator():
-        async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
-            async with client.stream("GET", stream_url, headers={
+    client = httpx.AsyncClient(timeout=60, follow_redirects=True)
+    try:
+        request_obj = client.build_request(
+            "GET",
+            stream_url,
+            headers={
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                 "Accept": "*/*",
-            }) as resp:
-                if resp.status_code != 200:
-                    raise HTTPException(status_code=502, detail=f"Upstream returned {resp.status_code}")
-                async for chunk in resp.aiter_bytes(chunk_size=65536):
-                    yield chunk
+            },
+        )
+        resp = await client.send(request_obj, stream=True)
+    except Exception:
+        await client.aclose()
+        raise
+
+    if resp.status_code != 200:
+        await resp.aclose()
+        await client.aclose()
+        raise HTTPException(status_code=502, detail=f"Upstream returned {resp.status_code}")
+
+    if not sanitize_stream_url(str(resp.url)):
+        await resp.aclose()
+        await client.aclose()
+        raise HTTPException(status_code=502, detail="Upstream redirected to an unsupported host")
+
+    media_type = _normalize_media_type(resp.headers.get("content-type"))
+
+    async def audio_generator():
+        try:
+            async for chunk in resp.aiter_bytes(chunk_size=65536):
+                yield chunk
+        finally:
+            await resp.aclose()
+            await client.aclose()
 
     return StreamingResponse(
         audio_generator(),
-        media_type="audio/mp4",
+        media_type=media_type,
         headers={
-            "Content-Type": "audio/mp4",
             "Cache-Control": "no-cache",
-            "Accept-Ranges": "bytes",
         },
     )
 

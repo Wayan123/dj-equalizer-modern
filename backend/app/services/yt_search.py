@@ -38,10 +38,12 @@ async def search_youtube(query: str, max_results: int = 8) -> list[dict]:
                 continue
             try:
                 data = json.loads(line)
-                video_id = data.get("id", "")
-                title = data.get("title", "Unknown")
+                if not isinstance(data, dict):
+                    continue
+                video_id = data.get("id") or ""
+                title = data.get("title") or "Unknown"
                 duration = data.get("duration")
-                channel = data.get("channel", data.get("uploader", ""))
+                channel = data.get("channel") or data.get("uploader") or ""
                 # Construct YouTube URL from video ID
                 url = f"https://www.youtube.com/watch?v={video_id}" if video_id else ""
                 if url:
