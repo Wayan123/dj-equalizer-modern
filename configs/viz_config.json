@@ -1,0 +1,18 @@
+{
+  "fftSize": 2048,
+  "smoothing": 0.8,
+  "barCount": 64,
+  "particleMax": 300,
+  "spectroScrollSpeed": 1,
+  "vuDecay": 0.92,
+  "glowBlur": 15,
+  "glowIntensity": 0.6,
+  "fpsTarget": 60,
+  "colors": {
+    "primary": "#00f0ff",
+    "secondary": "#ff00ff",
+    "accent": "#00ff88",
+    "warning": "#fbbf24",
+    "danger": "#ef4444"
+  }
+}

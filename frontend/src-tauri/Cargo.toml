@@ -1,0 +1,23 @@
+[package]
+name = "modern-audio-enhancer"
+version = "3.0.0"
+description = "Modern Audio Enhancer Desktop App"
+authors = ["Modern Audio Enhancer Team"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["protocol-asset"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", features = ["stream"] }
+rusqlite = { version = "0.31", features = ["bundled"] }
+regex = "1"
+dirs = "5"
+chrono = { version = "0.4", features = ["clock"] }
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+url = "2"

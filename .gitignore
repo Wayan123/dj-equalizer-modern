@@ -1,0 +1,36 @@
+# Generated build outputs
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/src-tauri/target/
+release/
+
+# Python caches
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*.pyd
+
+# Misc editor / OS files
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+*.Zone.Identifier
+*:Zone.Identifier
+AGENTS.md:Zone.Identifier
+
+# Local virtual envs
+backend/.venv/
+.venv/
+venv/
+
+# Workspace-only agent/tooling folders
+AGENTS.md
+.agents/
+.codex/
+.windsurf/
+tools/
+configs/agent-skills/
+configs/agent-skills.profile.md

@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ../backend
+    ports:
+      - "8800:8800"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8800
+      - CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+    volumes:
+      - /tmp/dj-eq-uploads:/tmp/dj-eq-uploads
+
+  frontend:
+    build: ../frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:8800
